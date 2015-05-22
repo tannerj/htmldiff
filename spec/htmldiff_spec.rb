@@ -28,6 +28,11 @@ describe "htmldiff" do
     expect(diff).to eq("a <del class=\"diffmod\">b</del><ins class=\"diffmod\">d</ins> c")
   end
 
+  it "should switch list tags" do
+    diff = TestDiff.diff('<ul><li>test<//li><//ul>', '<ol><li>test<//li><//ol>')
+    expect(diff).to eq("<ol><li>test<//li><//ol>")
+  end
+
   it "should support Chinese" do
     pending
     diff = TestDiff.diff('这个是中文内容, Ruby is the bast', '这是中国语内容，Ruby is the best language.')
