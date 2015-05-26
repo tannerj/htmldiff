@@ -1,18 +1,4 @@
 module HTMLDiff
-
-  Match = Struct.new(:start_in_old, :start_in_new, :size)
-  class Match
-    def end_in_old
-      self.start_in_old + self.size
-    end
-    
-    def end_in_new
-      self.start_in_new + self.size
-    end
-  end
-  
-  Operation = Struct.new(:action, :start_in_old, :end_in_old, :start_in_new, :end_in_new)
-
   class DiffBuilder
 
     def initialize(old_version, new_version)
@@ -133,34 +119,9 @@ module HTMLDiff
         match_length_at = new_match_length_at
       end
 
-#      best_match_in_old, best_match_in_new, best_match_size = add_matching_words_left(
-#          best_match_in_old, best_match_in_new, best_match_size, start_in_old, start_in_new)
-#      best_match_in_old, best_match_in_new, match_size = add_matching_words_right(
-#          best_match_in_old, best_match_in_new, best_match_size, end_in_old, end_in_new)
-
       return (best_match_size != 0 ? Match.new(best_match_in_old, best_match_in_new, best_match_size) : nil)
     end
 
-    def add_matching_words_left(match_in_old, match_in_new, match_size, start_in_old, start_in_new)
-      while match_in_old > start_in_old and 
-            match_in_new > start_in_new and 
-            @old_words[match_in_old - 1] == @new_words[match_in_new - 1]
-        match_in_old -= 1
-        match_in_new -= 1
-        match_size += 1
-      end
-      [match_in_old, match_in_new, match_size]
-    end
-
-    def add_matching_words_right(match_in_old, match_in_new, match_size, end_in_old, end_in_new)
-      while match_in_old + match_size < end_in_old and 
-            match_in_new + match_size < end_in_new and
-            @old_words[match_in_old + match_size] == @new_words[match_in_new + match_size]
-        match_size += 1
-      end
-      [match_in_old, match_in_new, match_size]
-    end
-    
     VALID_METHODS = [:replace, :insert, :delete, :equal]
 
     def perform_operation(operation)
@@ -259,7 +220,7 @@ module HTMLDiff
       mode = :char
       current_word  = ''
       words = []
-      
+
       explode(x).each do |char|
         case mode
         when :tag
@@ -309,11 +270,5 @@ module HTMLDiff
       words << current_word unless current_word.empty?
       words
     end
-
-  end # of class Diff Builder
-  
-  def diff(a, b)
-    DiffBuilder.new(a, b).build
   end
-
 end
